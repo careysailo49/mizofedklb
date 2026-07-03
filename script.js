@@ -1,5 +1,5 @@
 // Paste your actual Web App Executable URL below
-const API_URL = "https://script.google.com/macros/s/AKfycbwhemv6voGWTXXPFzEn8YXQ0MfCuMwGtp9xL9dllC58T7e1AOAwQzzJmSFw0kFpYjo/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx3GLZ0JEVVKQ2H6KU_hqK9xQPDxvHpcpUc0mHz_aS0zQoBjUeQQ2xCifQCE3dnyRnk/exec";
 
 let localDataStore = [];
 let filteredDataStore = [];
@@ -99,9 +99,9 @@ function searchUserByMobile() {
       results.forEach((item, index) => {
         let rowClass = item.isUserUpdated ? 'table-danger' : '';
         html += `<tr class="${rowClass}">
-          <td><strong>${item.consumerHming}</strong></td>
-          <td>${item.currentAddress}</td>
-          <td><span class="badge bg-secondary">${item.dacNumber}</span></td>
+          <td><strong>${item.consumerHming || ''}</strong></td>
+          <td>${item.currentAddress || ''}</td>
+          <td><span class="badge bg-secondary">${item.dacNumber || ''}</span></td>
           <td><button type="button" class="btn btn-warning btn-sm" onclick="loadUserFieldsToUpdate(${index})">Update Na</button></td>
         </tr>`;
       });
@@ -144,14 +144,14 @@ function searchExactUserByName() {
       let html = "";
       results.forEach((item, index) => {
         html += `<tr>
-          <td><small class="text-muted">${item.id}</small></td>
+          <td><small class="text-muted">${item.id || ''}</small></td>
           <td><small class="text-muted">${item.entryDateTime || ''}</small></td>
-          <td><strong>${item.consumerHming}</strong></td>
-          <td><span class="badge bg-secondary">${item.dacNumber}</span></td>
+          <td><strong>${item.consumerHming || ''}</strong></td>
+          <td><span class="badge bg-secondary">${item.dacNumber || ''}</span></td>
           <td><small class="text-muted">${item.dacUpdate || '---'}</small></td>
-          <td>${item.consumerNumber}</td>
-          <td><small>${item.currentAddress}</small></td>
-          <td>${item.mobileNumber}</td>
+          <td>${item.consumerNumber || ''}</td>
+          <td><small>${item.currentAddress || ''}</small></td>
+          <td>${item.mobileNumber || ''}</td>
           <td><button type="button" class="btn btn-warning btn-sm" onclick="loadUserFullFieldsToUpdate(${index})">Siam Ṭhatna</button></td>
         </tr>`;
       });
@@ -166,12 +166,12 @@ function loadUserFieldsToUpdate(index) {
   isUserUpdateMode = true;
   isFullEditMode = false;
   
-  document.getElementById('entryId').value = item.id;
-  document.getElementById('consumerHming').value = item.consumerHming;
+  document.getElementById('entryId').value = item.id || '';
+  document.getElementById('consumerHming').value = item.consumerHming || '';
   document.getElementById('dacNumber').value = ''; 
-  document.getElementById('consumerNumber').value = item.consumerNumber;
-  document.getElementById('mobileNumber').value = item.mobileNumber;
-  document.getElementById('currentAddress').value = item.currentAddress;
+  document.getElementById('consumerNumber').value = item.consumerNumber || '';
+  document.getElementById('mobileNumber').value = item.mobileNumber || '';
+  document.getElementById('currentAddress').value = item.currentAddress || '';
   document.getElementById('consumerHming').readOnly = true;
   document.getElementById('dacNumber').readOnly = false;
   document.getElementById('mobileNumber').readOnly = true;
@@ -196,12 +196,12 @@ function loadUserFullFieldsToUpdate(index) {
   if(!item) return;
   isUserUpdateMode = false;
   isFullEditMode = true;
-  document.getElementById('entryId').value = item.id;
-  document.getElementById('consumerHming').value = item.consumerHming;
-  document.getElementById('dacNumber').value = item.dacNumber;
-  document.getElementById('consumerNumber').value = item.consumerNumber;
-  document.getElementById('mobileNumber').value = item.mobileNumber;
-  document.getElementById('currentAddress').value = item.currentAddress;
+  document.getElementById('entryId').value = item.id || '';
+  document.getElementById('consumerHming').value = item.consumerHming || '';
+  document.getElementById('dacNumber').value = item.dacNumber || '';
+  document.getElementById('consumerNumber').value = item.consumerNumber || '';
+  document.getElementById('mobileNumber').value = item.mobileNumber || '';
+  document.getElementById('currentAddress').value = item.currentAddress || '';
   document.getElementById('consumerHming').readOnly = false;
   document.getElementById('dacNumber').readOnly = true;
   document.getElementById('mobileNumber').readOnly = true;
@@ -231,8 +231,8 @@ function loadDashboardData() {
 }
 
 function renderTable(data) {
-  localDataStore = data;
-  filteredDataStore = [...data];
+  localDataStore = data || [];
+  filteredDataStore = [...localDataStore];
   document.getElementById('searchHmingInput').value = '';
   currentPage = 1;
   renderPagination();
@@ -263,12 +263,12 @@ function renderPagination() {
     }
     html += `<tr ${rowStyle}>
       <td><small class="text-muted">${item.entryDateTime || ''}</small></td>
-      <td><strong>${item.consumerHming}</strong></td>
-      <td><span class="badge bg-secondary">${item.dacNumber}</span></td>
+      <td><strong>${item.consumerHming || ''}</strong></td>
+      <td><span class="badge bg-secondary">${item.dacNumber || ''}</span></td>
       <td><small class="text-muted">${item.dacUpdate || '---'}</small></td>
-      <td>${item.consumerNumber}</td>
-      <td><small>${item.currentAddress}</small></td>
-      <td>${item.mobileNumber}</td>
+      <td>${item.consumerNumber || ''}</td>
+      <td><small>${item.currentAddress || ''}</small></td>
+      <td>${item.mobileNumber || ''}</td>
       <td>
         <button class="btn btn-warning btn-sm btn-action" onclick="editEntry('${item.id}')">Edit</button>
         <button class="btn btn-danger btn-sm btn-action" onclick="deleteEntry('${item.id}')">Delete</button>
@@ -291,8 +291,11 @@ function changePage(page) {
 }
 
 function filterByHming() {
-  const searchString = document.getElementById('searchHmingInput').value.toLowerCase();
-  filteredDataStore = localDataStore.filter(item => item.consumerHming.toLowerCase().includes(searchString));
+  const searchString = document.getElementById('searchHmingInput').value.toLowerCase().trim();
+  filteredDataStore = localDataStore.filter(item => {
+    const name = item.consumerHming ? String(item.consumerHming).toLowerCase() : '';
+    return name.includes(searchString);
+  });
   currentPage = 1;
   renderPagination();
 }
@@ -345,12 +348,12 @@ function editEntry(id) {
   isUserUpdateMode = false;
   isFullEditMode = true;
   
-  document.getElementById('entryId').value = item.id;
-  document.getElementById('consumerHming').value = item.consumerHming;
-  document.getElementById('dacNumber').value = item.dacNumber;
-  document.getElementById('consumerNumber').value = item.consumerNumber;
-  document.getElementById('mobileNumber').value = item.mobileNumber;
-  document.getElementById('currentAddress').value = item.currentAddress;
+  document.getElementById('entryId').value = item.id || '';
+  document.getElementById('consumerHming').value = item.consumerHming || '';
+  document.getElementById('dacNumber').value = item.dacNumber || '';
+  document.getElementById('consumerNumber').value = item.consumerNumber || '';
+  document.getElementById('mobileNumber').value = item.mobileNumber || '';
+  document.getElementById('currentAddress').value = item.currentAddress || '';
   
   document.getElementById('consumerHming').readOnly = false;
   document.getElementById('dacNumber').readOnly = false;
