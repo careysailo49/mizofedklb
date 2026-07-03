@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mizofed Kolasib Online DAC Entry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container wrapper">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+      <h2 class="portal-title m-0">Mizofed Kolasib Online DAC Entry</h2>
+      <div>
+        <button id="userModeBtn" class="btn btn-outline-primary me-2" onclick="toggleUserLookupZone()">DAC Update Na</button>
+        <button id="authBtn" class="btn btn-outline-dark" onclick="toggleAdminAuth()">Admin Login</button>
+      </div>
+    </div>
+
+    <div class="card bg-white border-start border-primary border-4 p-3 mb-4 shadow-sm">
+      <h5 class="portal-subtitle m-0 text-primary">
+        <span class="fw-bold text-dark">PAWIMAWH:</span> Mizo tawng ziah dan dik takin, hawrrawpui leh hawrrawpte hawnrawp hmannna dik tak hmanga ziah luh tur a ni.
+      </h5>
+    </div>
+
+    <div class="row g-4" id="mainLayoutRow">
+      <div id="userLookupZone" class="col-md-12 mb-2" style="display: none;">
+        <div class="card border-primary">
+          <div class="card-header bg-primary text-white">I Data Awmsa Zawnna</div>
+          <div class="card-body p-4">
+            <div class="row align-items-end">
+              <div class="col-md-8 mb-2 mb-md-0">
+                <label class="form-label fw-bold text-secondary">I Booking-na Number Chhu Lut Rawh:</label>
+                <input type="tel" id="lookupMobile" class="form-control" maxlength="10" placeholder="Digit 10 chauh chhut tur">
+              </div>
+              <div class="col-md-4">
+                <button type="button" class="btn btn-success w-100" onclick="searchUserByMobile()">Hmet Rawh Le</button>
+              </div>
+            </div>
+            <div id="lookupStatus" class="mt-2 text-danger small font-weight-bold"></div>
+            <div id="userResultTableWrapper" class="table-responsive mt-3" style="display:none;">
+              <table class="table table-sm table-bordered align-middle small">
+                <thead class="table-light">
+                  <tr>
+                    <th>Hming</th>
+                    <th>Current Address</th>
+                    <th>DAC Eng zat?</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="userResultTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 d-flex flex-column gap-4" id="contentFlexWrapper">
+        <div id="adminDashboardZone" class="w-100" style="display: none;">
+          <div class="card mt-2">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+              <span>Admin Dashboard Panel</span> <span class="badge bg-success">Logged In</span>
+            </div>
+            <div class="card-body p-4">
+              <div class="row mb-3">
+                <div class="col-md-6 ms-auto">
+                  <div class="input-group"> <span class="input-group-text bg-light">Hming Zawnna:</span>
+                    <input type="text" id="searchHmingInput" class="form-control" onkeyup="filterByHming()" placeholder="Hming chhu rawh le...">
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Entry Date & Time</th>
+                      <th>Hming</th>
+                      <th>DAC No.</th>
+                      <th>DAC Update (Date & Time)</th>
+                      <th>Consumer No.</th>
+                      <th>Current Address</th>
+                      <th>Mobile</th>
+                      <th style="min-width: 140px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dataTableBody">
+                    <tr>
+                      <td colspan="8" class="text-center text-muted">Loading sheet data...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div id="paginationInfo" class="small text-muted">Showing 0 to 0 of 0 entries</div>
+                <nav>
+                  <ul class="pagination pagination-sm m-0" id="paginationControls"></ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="nameQueryResultZone" class="w-100" style="display: none;">
+          <div class="card border-success">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+              <span>Database Atanga Lak Chhuah Theih Te</span>
+              <button type="button" class="btn-close btn-close-white" onclick="document.getElementById('nameQueryResultZone').style.display='none';"></button>
+            </div>
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>ID</th>
+                      <th>Entry Date & Time</th>
+                      <th>Hming</th>
+                      <th>DAC No.</th>
+                      <th>DAC Update</th>
+                      <th>Consumer No.</th>
+                      <th>Current Address</th>
+                      <th>Mobile</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="nameQueryResultTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+          <div id="formColumn" class="col-lg-6">
+            <div class="card h-100">
+              <div class="card-header bg-primary text-white" id="formHeader">ZIAK LUT RAWH LE</div>
+              <div class="card-body p-4">
+                <form id="dacForm" onsubmit="handleFormSubmit(event)">
+                  <input type="hidden" id="entryId">
+
+                  <div class="mb-3">
+                    <label class="form-label fw-medium text-secondary">Consumer Hming</label>
+                    <div class="input-group">
+                      <input type="text" id="consumerHming" class="form-control" required placeholder="Consumer Card a hming ang thlapin aw.">
+                      <button type="button" id="nameSearchBtn" class="btn btn-dark d-inline-flex align-items-center gap-2" onclick="searchExactUserByName()">
+                        <span id="nameSearchSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                        <span id="nameSearchBtnText">Hming Enna</span> 
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-medium text-secondary">DAC Number</label>
+                    <input type="text" id="dacNumber" class="form-control" pattern="[0-9]{6}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);" required placeholder="DAC Number chhu lut rawh">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-medium text-secondary">Consumer Number</label>
+                    <input type="text" id="consumerNumber" class="form-control" oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');" required placeholder="Consumer Number chhu lut rawh">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-medium text-secondary">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" class="form-control" maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" title="Khawngaihin number 10 chauh chhuah rawh" placeholder="Digit 10 chauh" required>
+                    <div class="form-text text-muted">I Booking Call-na Number ngei kha aw.</div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label fw-medium text-secondary">Current Address</label>
+                    <select id="currentAddress" class="form-select" required>
+                      <option value="" disabled selected>Address thlang rawh</option>
+                      <option value="Thingdawl">Thingdawl</option>
+                      <option value="Khuangpuilam">Khuangpuilam</option>
+                      <option value="Vengthar">Vengthar</option>
+                      <option value="Diakkawn">Diakkawn</option>
+                      <option value="New Diakkawn">New Diakkawn</option>
+                      <option value="Salem Veng">Salem Veng</option>
+                      <option value="College Veng">College Veng</option>
+                      <option value="Project Veng">Project Veng</option>
+                      <option value="Venglai">Venglai</option>
+                      <option value="Tumpui">Tumpui</option>
+                      <option value="Hmar Veng">Hmar Veng</option>
+                      <option value="Electric Veng">Electric Veng</option>
+                      <option value="Saidan">Saidan</option>
+                      <option value="Venglai East">Venglai East</option>
+                      <option value="Tuitha Veng">Tuitha Veng</option>
+                      <option value="Rengtekawn">Rengtekawn</option>
+                      <option value="Gosen Veng">Gosen Veng</option>
+                      <option value="New Builum">New Builum</option>
+                    </select>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex flex-column gap-2 w-100">
+                      <button type="submit" id="submitBtn" class="btn btn-primary w-100">Mizofed Office-a Thawnna</button>
+                      <button type="button" id="cancelBtn" class="btn btn-secondary w-100 d-none" onclick="resetForm()">Cancel</button>
+                    </div>
+                    <div id="formSpinner" class="spinner-border text-primary loader" role="status" style="display: none;"></div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="distributor-banner">
+              <div class="distributor-image-box-landscape">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" alt="Mizofed Kolasib Office" class="distributor-img">
+              </div>
+              <div class="distributor-info-wrapper">
+                <div class="distributor-title">Mizofed Kolasib</div>
+                <div class="distributor-badge">Authorized Distributor</div>
+              </div>
+              <hr class="w-100 my-3 opacity-25">
+              <div class="compact-notice-container">
+                <p class="notice-text">Harsatna leh buaina i neih chuan a hnuaia number-ah hian Office hun chhungin min rawn be dawn ania.</p>
+                <div class="notice-contact-row">
+                  <div class="static-phone-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
+                    </svg>
+                  </div>
+                  <span class="notice-phone-numbers">7630079087</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container text-center">
+      <div class="fw-bold text-dark">Developed by Carey Sailo</div>
+      <div class="small text-muted text-uppercase tracking-wider mt-1" style="font-size: 0.75rem; letter-spacing: 0.8px;">Khuangpuilam, 7005133582</div>
+    </div>
+  </footer>
+
+  <div class="modal fade" id="loginModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius:12px; border:none;">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-semibold">Admin Authorization</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="loginError" class="alert alert-danger d-none" role="alert">Username or password dik lo!</div>
+          <div class="mb-3">
+            <label class="form-label fw-medium text-secondary">Username</label>
+            <input type="text" id="adminUser" class="form-control" autocomplete="off">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium text-secondary">Password</label>
+            <input type="password" id="adminPass" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="verifyCredentials()">Verify & Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
