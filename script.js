@@ -9,8 +9,12 @@ let isUserUpdateMode = false;
 let isFullEditMode = false;
 let loginModalObj;
 
+// Pagination variables
 let currentPage = 1;
-const itemsPerPage = 20;
+const itemsPerPage = 15;
+
+let nameQueryCurrentPage = 1;
+const nameQueryItemsPerPage = 15;
 
 window.onload = function() {
   loginModalObj = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -114,7 +118,6 @@ function searchUserByMobile() {
 function searchExactUserByName() {
   const nameInput = document.getElementById('consumerHming').value.trim();
   const resultZone = document.getElementById('nameQueryResultZone');
-  const tbody = document.getElementById('nameQueryResultTableBody');
   const searchBtn = document.getElementById('nameSearchBtn');
   const btnText = document.getElementById('nameSearchBtnText');
   const spinner = document.getElementById('nameSearchSpinner');
@@ -141,24 +144,58 @@ function searchExactUserByName() {
       }
       
       window.nameQueryResultStore = results;
-      let html = "";
-      results.forEach((item, index) => {
-        html += `<tr>
-          <td><small class="text-muted">${item.id || ''}</small></td>
-          <td><small class="text-muted">${item.entryDateTime || ''}</small></td>
-          <td><strong>${item.consumerHming || ''}</strong></td>
-          <td><span class="badge bg-secondary">${item.dacNumber || ''}</span></td>
-          <td><small class="text-muted">${item.dacUpdate || '---'}</small></td>
-          <td>${item.consumerNumber || ''}</td>
-          <td><small>${item.currentAddress || ''}</small></td>
-          <td>${item.mobileNumber || ''}</td>
-          <td><button type="button" class="btn btn-warning btn-sm" onclick="loadUserFullFieldsToUpdate(${index})">Siam Ṭhatna</button></td>
-        </tr>`;
-      });
-      tbody.innerHTML = html;
+      nameQueryCurrentPage = 1;
+      renderNameQueryPagination();
+      
       resultZone.style.display = "block";
       resultZone.scrollIntoView({ behavior: 'smooth' });
     });
+}
+
+function renderNameQueryPagination() {
+  const tbody = document.getElementById('nameQueryResultTableBody');
+  const results = window.nameQueryResultStore || [];
+  const totalItems = results.length;
+  
+  if (totalItems === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Data engmah hmuh a ni lo.</td></tr>';
+    document.getElementById('nameQueryPaginationInfo').innerText = "Showing 0 to 0 of 0 entries";
+    document.getElementById('nameQueryPaginationControls').innerHTML = '';
+    return;
+  }
+  
+  const totalPages = Math.ceil(totalItems / nameQueryItemsPerPage);
+  if (nameQueryCurrentPage > totalPages) nameQueryCurrentPage = totalPages;
+  if (nameQueryCurrentPage < 1) nameQueryCurrentPage = 1;
+  
+  const startIndex = (nameQueryCurrentPage - 1) * nameQueryItemsPerPage;
+  const endIndex = Math.min(startIndex + nameQueryItemsPerPage, totalItems);
+  const pageItems = results.slice(startIndex, endIndex);
+  
+  let html = "";
+  pageItems.forEach((item, index) => {
+    const actualIndex = startIndex + index;
+    html += `<tr>
+      <td><small class="text-muted">${item.id || ''}</small></td>
+      <td><small class="text-muted">${item.entryDateTime || ''}</small></td>
+      <td><strong>${item.consumerHming || ''}</strong></td>
+      <td><span class="badge bg-secondary">${item.dacNumber || ''}</span></td>
+      <td><small class="text-muted">${item.dacUpdate || '---'}</small></td>
+      <td>${item.consumerNumber || ''}</td>
+      <td><small>${item.currentAddress || ''}</small></td>
+      <td>${item.mobileNumber || ''}</td>
+      <td><button type="button" class="btn btn-warning btn-sm" onclick="loadUserFullFieldsToUpdate(${actualIndex})">Siam Ṭhatna</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+  
+  document.getElementById('nameQueryPaginationInfo').innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
+  document.getElementById('nameQueryPaginationControls').innerHTML = buildTruncatedPagination(nameQueryCurrentPage, totalPages, 'changeNameQueryPage');
+}
+
+function changeNameQueryPage(page) {
+  nameQueryCurrentPage = page;
+  renderNameQueryPagination();
 }
 
 function loadUserFieldsToUpdate(index) {
@@ -277,12 +314,39 @@ function renderPagination() {
   });
   tbody.innerHTML = html;
   document.getElementById('paginationInfo').innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
-  let navHtml = `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a></li>`;
-  for(let i = 1; i <= totalPages; i++) {
-    navHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+  document.getElementById('paginationControls').innerHTML = buildTruncatedPagination(currentPage, totalPages, 'changePage');
+}
+
+/**
+ * Universal sliding pagination builder that hides excess layout numbers
+ */
+function buildTruncatedPagination(activePage, totalPages, clickHandlerName) {
+  let html = `<li class="page-item ${activePage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="${clickHandlerName}(${activePage - 1}); return false;">Previous</a></li>`;
+  
+  const allowedRange = 2; // How many buttons around active page to show
+  let start = Math.max(1, activePage - allowedRange);
+  let end = Math.min(totalPages, activePage + allowedRange);
+  
+  if (start > 1) {
+    html += `<li class="page-item"><a class="page-link" href="#" onclick="${clickHandlerName}(1); return false;">1</a></li>`;
+    if (start > 2) {
+      html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
   }
-  navHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a></li>`;
-  document.getElementById('paginationControls').innerHTML = navHtml;
+  
+  for (let i = start; i <= end; i++) {
+    html += `<li class="page-item ${activePage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="${clickHandlerName}(${i}); return false;">${i}</a></li>`;
+  }
+  
+  if (end < totalPages) {
+    if (end < totalPages - 1) {
+      html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+    html += `<li class="page-item"><a class="page-link" href="#" onclick="${clickHandlerName}(${totalPages}); return false;">${totalPages}</a></li>`;
+  }
+  
+  html += `<li class="page-item ${activePage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="${clickHandlerName}(${activePage + 1}); return false;">Next</a></li>`;
+  return html;
 }
 
 function changePage(page) {
