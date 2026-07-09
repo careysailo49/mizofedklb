@@ -18,6 +18,15 @@ const nameQueryItemsPerPage = 15;
 
 window.onload = function() {
   loginModalObj = new bootstrap.Modal(document.getElementById('loginModal'));
+
+  // Restore admin session if it exists in sessionStorage
+  if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+    isAdminLoggedIn = true;
+    document.getElementById('authBtn').innerText = "Logout Admin";
+    document.getElementById('authBtn').className = "btn btn-danger";
+    document.getElementById('adminDashboardZone').style.display = 'block';
+    loadDashboardData();
+  }
 };
 
 function toggleUserLookupZone() {
@@ -44,6 +53,7 @@ function toggleUserLookupZone() {
 function toggleAdminAuth() {
   if (isAdminLoggedIn) {
     isAdminLoggedIn = false;
+    sessionStorage.removeItem('isAdminLoggedIn'); // Clear session on manual logout
     document.getElementById('authBtn').innerText = "Admin Login";
     document.getElementById('authBtn').className = "btn btn-outline-dark";
     document.getElementById('adminDashboardZone').style.display = 'none';
@@ -64,6 +74,7 @@ function verifyCredentials() {
   const pass = document.getElementById('adminPass').value;
   if (user === "mizofedkol" && pass === "Gasuih123") {
     isAdminLoggedIn = true;
+    sessionStorage.setItem('isAdminLoggedIn', 'true'); // Save session state
     loginModalObj.hide();
     document.getElementById('authBtn').innerText = "Logout Admin";
     document.getElementById('authBtn').className = "btn btn-danger";
@@ -317,13 +328,10 @@ function renderPagination() {
   document.getElementById('paginationControls').innerHTML = buildTruncatedPagination(currentPage, totalPages, 'changePage');
 }
 
-/**
- * Universal sliding pagination builder that hides excess layout numbers
- */
 function buildTruncatedPagination(activePage, totalPages, clickHandlerName) {
   let html = `<li class="page-item ${activePage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="${clickHandlerName}(${activePage - 1}); return false;">Previous</a></li>`;
   
-  const allowedRange = 2; // How many buttons around active page to show
+  const allowedRange = 2; 
   let start = Math.max(1, activePage - allowedRange);
   let end = Math.min(totalPages, activePage + allowedRange);
   
@@ -342,7 +350,7 @@ function buildTruncatedPagination(activePage, totalPages, clickHandlerName) {
     if (end < totalPages - 1) {
       html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
     }
-    html += `<li class="page-item"><a class="page-link" href="#" onclick="${clickHandlerName}(${totalPages}); return false;">${totalPages}</a></li>`;
+    html += `<li class="page-item"><a class="page-link" href="#" onclick="${clickHandlerName}(totalPages); return false;">${totalPages}</a></li>`;
   }
   
   html += `<li class="page-item ${activePage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="${clickHandlerName}(${activePage + 1}); return false;">Next</a></li>`;
